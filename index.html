@@ -13,6 +13,7 @@
 <div id="container">
     <h1>ToDo</h1>
     <input id="new-todo" placeholder="ToDo Title" autofocus name="title">
+    <ul id="todo-list"></ul>
 </div>
 
 <script type="text/javascript">
@@ -51,6 +52,7 @@
         },
         initialize: function() {
             console.log('AppView:Initialize');
+            app.ToDos.on('add', this.addOne, this);
             this.render();
         },
         render: function() {
@@ -72,11 +74,11 @@
 
             //Data aan collectie toevoegen en opslaan
             app.ToDos.create(data);
-
-            //Collectie tonen
-
             //Input leegmaken
             $(event.target).val('');
+        },
+        addOne: function(todo) {
+            $('#todo-list').append('<li>Een nieuwe ToDo gevraagd!</li>');
         }
     });
 
