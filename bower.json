@@ -1,0 +1,20 @@
+{
+  "name": "Basic",
+  "version": "0.0.0",
+  "authors": [
+    "koen Huybrechts <koen@appsaloon.be>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "backbone": "~1.1.2",
+    "backbone.localStorage": "~1.1.13",
+    "jquery": "~2.1.1"
+  }
+}
