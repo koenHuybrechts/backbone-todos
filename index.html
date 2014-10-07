@@ -58,7 +58,8 @@
             //this.$el.html('Hello World');
         },
         createToDo: function(event) {
-            if(event.which !== 13) {
+            if(event.which !== 13 || !$(event.target).val().trim()) {
+                console.log('AppView:CreateToDo:Empty or not Enter');
                 return;
             }
 
