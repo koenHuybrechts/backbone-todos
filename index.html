@@ -16,6 +16,12 @@
     <ul id="todo-list"></ul>
 </div>
 
+<script type="text/template" id="item-template">
+    <div class="view">
+        <input type="checkbox"><label><%- title %></label>
+    </div>
+</script>
+
 <script type="text/javascript">
     // Variable that contains all the app components
     var app = {};
@@ -78,7 +84,21 @@
             $(event.target).val('');
         },
         addOne: function(todo) {
-            $('#todo-list').append('<li>Een nieuwe ToDo gevraagd!</li>');
+            console.log('AppView:addOne');
+            var view = new app.TodoView({model: todo});
+            console.log('AppView:Prepared');
+            $('#todo-list').append(view.render().el);
+            console.log('AppView:Render Done');
+        }
+    });
+
+    app.TodoView = Backbone.View.extend({
+        tagName: 'li',
+        template: _.template($('#item-template').html()),
+        render: function() {
+            console.log('TodoView: Render');
+            this.$el.html(this.template(this.model.toJSON()));
+            return this;
         }
     });
 
