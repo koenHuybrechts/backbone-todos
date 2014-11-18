@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/underscore/underscore.js"></script>
+    <script src="bower_components/backbone/backbone.js"></script>
+    <script src="bower_components/firebase/firebase-debug.js"></script>
+    <script src="bower_components/backfire/dist/backfire.js"></script>
+</head>
+<body>
+
+<div id="container">
+    <h1>ToDo</h1>
+    <input id="new-todo" placeholder="ToDo Title" autofocus name="title">
+    <span><a href="#status/all">All</a> <a href="#status/todo">ToDo</a> <a href="#status/completed">Completed</a></span>
+    <ul id="todo-list"></ul>
+</div>
+
+<script type="text/template" id="item-template">
+    <div class="view">
+        <input type="checkbox"<%= completed ?  ' checked' : '' %>><label><%- title %></label>
+    </div>
+</script>
+
+<script type="text/javascript">
+    // Variable that contains all the app components
+    var app = {};
+
+    //Define model
+    app.ToDoModel = Backbone.Model.extend({
+        defaults: {
+            title: '',
+            completed: false
+        }
+    });
+
+    //Define collection
+    app.ToDoCollection = Backbone.Collection.extend({
+        model: app.ToDoModel,
+        firebase: new Backbone.Firebase("https://shining-heat-7617.firebaseio.com")
+    });
+
+    //Collection instance
+    app.ToDos = new app.ToDoCollection();
+
+    //Add new ToDo item to Collection
+    /*
+    app.ToDos.create({
+        title: 'View aanmaken'
+    });
+    */
+
+    app.AppView = Backbone.View.extend({
+        el: '#container',
+        events: {
+            //'NaamEvent ElementJquery': 'Functie'
+            'keypress #new-todo': 'createToDo'
+        },
+        initialize: function() {
+            console.log('AppView:Initialize');
+            app.ToDos.on('add', this.addOne, this);
+            app.ToDos.on('reset', this.addAll, this);
+            app.ToDos.fetch(); // Loads list from local storage
+        },
+        render: function() {
+            console.log('AppView:Render');
+            //this.$el.html('Hello World');
+        },
+        createToDo: function(event) {
+            if(event.which !== 13 || !$(event.target).val().trim()) {
+                console.log('AppView:CreateToDo:Empty or not Enter');
+                return;
+            }
+
+            console.log('AppView:CreateToDo');
+
+            //Input uitlezen
+            var data = {
+                title: $(event.target).val()
+            };
+
+            //Data aan collectie toevoegen en opslaan
+            app.ToDos.create(data);
+            //Input leegmaken
+            $(event.target).val('');
+        },
+        addAll: function(){
+            this.$('#todo-list').html(''); // clean the todo list
+            app.ToDos.each(this.addOne, this);
+        },
+        addOne: function(todo) {
+            var view = new app.TodoView({model: todo});
+            $('#todo-list').append(view.render().el);
+        },
+        showOnStatus: function(status) {
+            this.$('#todo-list').html(''); // clean the todo list
+
+            switch(status) {
+                case 'completed':
+                    var completedToDos = app.ToDos.filter(function(ToDo) {
+                        return ToDo.get('completed');
+                    });
+                    _.each(completedToDos, this.addOne, this);
+                    break;
+                case 'todo':
+                    var uncompletedToDos = app.ToDos.filter(function(ToDo) {
+                        return !ToDo.get('completed');
+                    });
+                    _.each(uncompletedToDos, this.addOne, this);
+                    break;
+                default:
+                    app.ToDos.each(this.addOne, this);
+                    break;
+            }
+        }
+    });
+
+    app.TodoView = Backbone.View.extend({
+        tagName: 'li',
+        template: _.template($('#item-template').html()),
+        events: {
+            'click input[type=checkbox]': 'setCompleted'
+        },
+        render: function() {
+            console.log('TodoView: Render');
+            this.$el.html(this.template(this.model.toJSON()));
+            return this;
+        },
+        setCompleted: function(event) {
+            var completed = this.model.get('completed');
+            this.model.set('completed', !completed);
+            this.model.save();
+        }
+    });
+
+    app.Router = Backbone.Router.extend({
+        routes: {
+            'filter/:query': 'setFilter',
+            'status/:type': 'showOnStatus'
+        },
+        setFilter: function(query) {
+            console.log(query);
+        },
+        showOnStatus: function(status) {
+            console.log('Status: ' + status);
+
+            app.AppViewInstance.showOnStatus(status);
+        }
+    });
+
+    app.RouterInstance = new app.Router();
+    app.AppViewInstance = new app.AppView();
+    Backbone.history.start();
+
+
+</script>
+</body>
+</html>

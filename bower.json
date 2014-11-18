@@ -15,6 +15,7 @@
   "dependencies": {
     "backbone": "~1.1.2",
     "backbone.localStorage": "~1.1.13",
-    "jquery": "~2.1.1"
+    "jquery": "~2.1.1",
+    "backfire": "~0.4.0"
   }
 }
