@@ -27,6 +27,7 @@
 <script type="text/javascript">
     // Variable that contains all the app components
     var app = {};
+    var ref = new Firebase("https://shining-heat-7617.firebaseio.com/todos");
 
     //Define model
     app.ToDoModel = Backbone.Model.extend({
@@ -60,9 +61,25 @@
         },
         initialize: function() {
             console.log('AppView:Initialize');
-            app.ToDos.on('add', this.addOne, this);
-            app.ToDos.on('reset', this.addAll, this);
-            app.ToDos.fetch(); // Loads list from local storage
+
+            var userAuth = ref.getAuth();
+
+            if(userAuth) {
+                app.ToDos.on('add', this.addOne, this);
+                app.ToDos.on('reset', this.addAll, this);
+                app.ToDos.fetch(); // Loads list from local storage
+            } else {
+                ref.authWithPassword({
+                    email: 'koen@appsaloon.be',
+                    password: 'qbcdef'
+                }, function(error, userAuth) {
+                    if(error) {
+                        alert(error.message);
+                    } else {
+                        app.RouterInstance('status/todo')
+                    }
+                });
+            }
         },
         render: function() {
             console.log('AppView:Render');

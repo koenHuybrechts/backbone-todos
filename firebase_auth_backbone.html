@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/underscore/underscore.js"></script>
+    <script src="bower_components/backbone/backbone.js"></script>
+    <script src="bower_components/firebase/firebase-debug.js"></script>
+    <script src="bower_components/backfire/dist/backfire.js"></script>
+</head>
+<body>
+
+<script type="text/javascript">
+
+    var app = {};
+    var ref = new Firebase("https://shining-heat-7617.firebaseio.com/todos");
+
+    app.Router = Backbone.Router.extend({
+        initialize: function() {
+        },
+        routes: {
+            '': 'home',
+            'login': 'login',
+            'logout': 'logout'
+        },
+        home: function() {
+
+            if(!ref.getAuth()) {
+                Backbone.history.navigate('login', {trigger: true});
+                return;
+            }
+
+            console.log('Route: Home');
+            $('body').append('<a href="#logout">Logout</a>');
+        },
+        login: function() {
+            console.log('Route: Login');
+
+            ref.authWithPassword({
+                email: 'koen@appsaloon.be',
+                password: 'qbcdef'
+            }, function(error, userAuth) {
+                if(error) {
+                    alert(error.message);
+                } else {
+                    Backbone.history.navigate('', {trigger: true});
+                }
+            });
+        },
+        logout: function() {
+            console.log('Route Logout');
+            ref.unauth(function() {
+                console.log('Unauthed');
+            });
+        }
+    });
+
+    app.RouterInstance = new app.Router();
+    Backbone.history.start();
+
+
+
+</script>
+</body>
+</html>
