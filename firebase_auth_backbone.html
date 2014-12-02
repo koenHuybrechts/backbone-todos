@@ -17,8 +17,6 @@
     var ref = new Firebase("https://shining-heat-7617.firebaseio.com/todos");
 
     app.Router = Backbone.Router.extend({
-        initialize: function() {
-        },
         routes: {
             '': 'home',
             'login': 'login',
@@ -58,8 +56,6 @@
 
     app.RouterInstance = new app.Router();
     Backbone.history.start();
-
-
 
 </script>
 </body>
