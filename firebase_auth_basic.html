@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/underscore/underscore.js"></script>
+    <script src="bower_components/backbone/backbone.js"></script>
+    <script src="bower_components/firebase/firebase-debug.js"></script>
+    <script src="bower_components/backfire/dist/backfire.js"></script>
+</head>
+<body>
+
+<script type="text/javascript">
+
+    //Connect for Database & Store connection in var ref
+    var ref = new Firebase("https://shining-heat-7617.firebaseio.com/todos");
+
+    var userAuth = ref.getAuth();
+    var message = 'De standaard tekst';
+
+    if(userAuth) {
+        message = 'Aangemeld';
+        ref.unauth();
+    } else {
+        ref.authWithPassword({
+            email: 'koen@appsaloon.be',
+            password: 'qbcdef'
+        }, function(error, userAuth) {
+            if(error) {
+                alert(error.message);
+            } else {
+                message = 'Nu net Aangemeld';
+                $('body').append(message);
+            }
+        });
+    }
+
+    $('body').append(message);
+
+</script>
+</body>
+</html>
