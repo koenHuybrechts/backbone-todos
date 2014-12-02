@@ -11,10 +11,65 @@
 </head>
 <body>
 
+<div id="container" style="border-color: red; border-width: thin; border-style: solid"></div>
+
+<script type="text/template" id="login-template">
+<form id="login-form">
+    Email <input type="email" name="email"><br>
+    Password <input type="password" name="password"><br />
+    <input type="submit" name="login">
+</form>
+</script>
+<script type="text/javascript">
+    $.fn.serializeObject = function() {
+        var o = {};
+        var a = this.serializeArray();
+        $.each(a, function() {
+            if (o[this.name]) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };
+</script>
 <script type="text/javascript">
 
     var app = {};
     var ref = new Firebase("https://shining-heat-7617.firebaseio.com/todos");
+
+    app.LoginView = Backbone.View.extend({
+        el: '#container',
+        template: _.template($('#login-template').html()),
+        initialize: function() {
+            console.log('LoginView: Initialize');
+        },
+        events: {
+            'submit #login-form': 'processAuth'
+        },
+        processAuth: function(event) {
+            event.preventDefault();
+
+            var data = $('#login-form').serializeObject();
+
+            ref.authWithPassword(data, function(error, userAuth) {
+                if(error) {
+                    alert(error.message);
+                } else {
+                    Backbone.history.navigate('', {trigger: true});
+                }
+            });
+
+        },
+        render: function() {
+            this.$el.html(this.template());
+        }
+    });
+
 
     app.Router = Backbone.Router.extend({
         routes: {
@@ -35,6 +90,9 @@
         login: function() {
             console.log('Route: Login');
 
+            var loginView = new app.LoginView();
+            loginView.render();
+            /*
             ref.authWithPassword({
                 email: 'koen@appsaloon.be',
                 password: 'qbcdef'
@@ -45,6 +103,7 @@
                     Backbone.history.navigate('', {trigger: true});
                 }
             });
+            */
         },
         logout: function() {
             console.log('Route Logout');
