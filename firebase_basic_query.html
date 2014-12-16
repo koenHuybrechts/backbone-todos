@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/underscore/underscore.js"></script>
+    <script src="bower_components/backbone/backbone.js"></script>
+    <script src="bower_components/firebase/firebase-debug.js"></script>
+    <script src="bower_components/backfire/dist/backfire.js"></script>
+</head>
+<body>
+
+<script type="text/javascript">
+
+
+    //Define model
+    var ToDoModel = Backbone.Model.extend({
+        defaults: {
+            title: '',
+            completed: false
+        }
+    });
+
+    var ToDos = Backbone.Firebase.Collection.extend({
+        firebase: function() {
+            return new Firebase('https://shining-heat-7617.firebaseio.com').limitToFirst(10);
+        },
+        model: ToDoModel
+    });
+
+    var ToDosCollection = new ToDos();
+
+</script>
+</body>
+</html>
